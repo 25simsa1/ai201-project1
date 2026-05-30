@@ -9,7 +9,11 @@
 
 ## Domain
 
-<!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
+Professor and course reviews for Colby College, sourced from Rate My Professors.
+This knowledge is valuable because students rely heavily on peer advice when
+choosing courses, but there's no easy way to query across multiple professors
+at once. A RAG system lets students ask natural questions and get synthesized
+answers across many reviews instantly.
 
 ---
 
@@ -20,16 +24,17 @@
 
 | # | Source | Description | URL or location |
 |---|--------|-------------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/132637 |
+| 2 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/342085 |
+| 3 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/3159202 |
+| 4 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/952332 |
+| 5 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/2232428 |
+| 6 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/63976 |
+| 7 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/64321 |
+| 8 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/328533 |
+| 9 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/2054082 |
+| 10 | Rate My Professors | Colby professor reviews | https://www.ratemyprofessors.com/professor/1350504 |
+
 
 ---
 
@@ -40,11 +45,14 @@
      numbers fit the structure of your documents.
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
-**Chunk size:**
+**Chunk size:** 300 tokens
 
-**Overlap:**
+**Overlap:** 50 tokens
 
-**Reasoning:**
+**Reasoning:** Rate My Professors reviews are short (1-5 sentences each).
+A 300-token chunk fits 2-4 reviews together, giving enough context without
+mixing too many professors. A 50-token overlap ensures a review that falls
+on a chunk boundary isn't split in a way that loses meaning.
 
 ---
 
@@ -56,11 +64,15 @@
      would you weigh in choosing a different embedding model — context length, multilingual
      support, accuracy on domain-specific text, latency? -->
 
-**Embedding model:**
+**Embedding model:** all-MiniLM-L6-v2 via sentence-transformers
 
-**Top-k:**
+**Top-k:** 5
 
-**Production tradeoff reflection:**
+**Production tradeoff reflection:** In a real deployment I would consider
+a larger model like text-embedding-3-large for better accuracy on
+domain-specific student language (slang, shorthand). The tradeoff is
+higher latency and cost. all-MiniLM-L6-v2 is fast and free, which fits
+this project well.
 
 ---
 
@@ -73,11 +85,11 @@
 
 | # | Question | Expected answer |
 |---|----------|-----------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+| 1 | Which Colby professors are known for being engaging in lectures? | Names of professors frequently described as engaging or enthusiastic |
+| 2 | Which professors have the lightest workload? | Names of professors reviewed as having manageable assignments |
+| 3 | Which professors are recommended for students new to a subject? | Names of professors praised for being approachable and clear |
+| 4 | What do students say about grading fairness at Colby? | Summary of reviews mentioning fair or unfair grading |
+| 5 | Which professors give the most helpful feedback on assignments? | Names of professors noted for detailed or useful feedback |
 
 ---
 
@@ -87,9 +99,9 @@
      Consider: noisy or inconsistent documents, missing source attribution, off-topic
      retrieval, chunks that split key information across boundaries. -->
 
-1.
+1. **Vague reviews:** Student reviews often use vague language ("great prof!", "hard but worth it") that may not retrieve well for specific questions about workload or teaching style.
 
-2.
+2. **Cross-professor confusion:** Because all reviews are pooled into one vector store, a query about one professor could retrieve chunks about a different professor with similar reviews, leading the LLM to attribute the wrong opinions. I'll watch for this during evaluation and may add professor-name metadata
 
 ---
 
@@ -101,6 +113,26 @@
      You can use ASCII art, a Mermaid diagram, or embed a sketch as an image.
      You'll use this diagram as context when prompting AI tools to implement each stage. -->
 
+
+┌─────────────────┐     ┌─────────────────┐     ┌──────────────────────┐
+│ 1. Ingestion    │     │ 2. Chunking     │     │ 3. Embedding + Store │
+│                 │     │                 │     │                      │
+│ Fetch RMP pages │ ──> │ Split text into │ ──> │ all-MiniLM-L6-v2     │
+│ requests +      │     │ 300-token chunks│     │ (sentence-           │
+│ BeautifulSoup   │     │ 50-token overlap│     │  transformers)       │
+│                 │     │                 │     │ → stored in ChromaDB │
+└─────────────────┘     └─────────────────┘     └──────────────────────┘
+                                                            │
+                                                            v
+                        ┌─────────────────┐     ┌──────────────────────┐
+                        │ 5. Generation   │     │ 4. Retrieval         │
+                        │                 │     │                      │
+                        │ Groq            │ <── │ Embed user query,    │
+                        │ llama-3.3-70b-  │     │ find top-k=5 most     │
+                        │ versatile       │     │ similar chunks from  │
+                        │ answers using   │     │ ChromaDB             │
+                        │ retrieved chunks│     │                      │
+                        └─────────────────┘     └──────────────────────┘
 ---
 
 ## AI Tool Plan
@@ -115,8 +147,4 @@
      "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
      with my specified chunk size and overlap" is a plan. -->
 
-**Milestone 3 — Ingestion and chunking:**
 
-**Milestone 4 — Embedding and retrieval:**
-
-**Milestone 5 — Generation and interface:**
