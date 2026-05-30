@@ -146,5 +146,33 @@ this project well.
      "I'll use AI to help me code" is not a plan.
      "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
      with my specified chunk size and overlap" is a plan. -->
+     
+**Milestone 3 — Ingestion and chunking:**
+I'll use Claude. I'll give it my Documents table and Chunking Strategy section
+along with the requirement that ingestion use requests + BeautifulSoup and
+chunking use 300-token chunks with 50-token overlap. I expect it to produce
+(a) a scraper that loops over my 10 RMP URLs and extracts review text plus the
+professor name, and (b) a chunk_text() function that returns chunks at my
+specified size and overlap with professor-name metadata attached. I'll verify
+by checking that all 10 sources produce non-empty text files and by printing
+sample chunks to confirm their token sizes match the spec.
 
+**Milestone 4 — Embedding and retrieval:**
+I'll use Claude. I'll give it my Retrieval Approach section, specifying
+all-MiniLM-L6-v2 via sentence-transformers, storage in ChromaDB, and top-k=5.
+I expect it to produce code that embeds every chunk, stores them in a ChromaDB
+collection with their metadata, and runs a query by embedding the question and
+returning the 5 most similar chunks. I'll verify by running test queries (e.g.
+"engaging lecturer") and confirming the retrieved chunks are actually relevant
+to the query.
+
+**Milestone 5 — Generation and interface:**
+I'll use Claude. I'll give it my full pipeline spec plus my Evaluation Plan
+section. I expect it to produce code that takes a user question, retrieves the
+top-5 chunks, builds a prompt containing those chunks as context, and calls the
+Groq llama-3.3-70b-versatile model to generate an answer, plus a simple
+command-line interface for asking questions. I'll verify by running my 5
+evaluation questions and comparing each answer against my expected answers,
+checking that the system cites information actually present in the reviews.
+That's specific in the way the prompt asks for — it names the tool, the exact inputs (which planning sections), the expected output, and a concrete
 
