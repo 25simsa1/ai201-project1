@@ -115,25 +115,25 @@ this project well.
 
 
 ┌─────────────────┐     ┌─────────────────┐     ┌──────────────────────┐
-│ 1. Ingestion    │     │ 2. Chunking     │     │ 3. Embedding + Store │
-│                 │     │                 │     │                      │
+│  1. Ingestion   │     │  2. Chunking    │     │  3. Embedding +      │
+│                 │     │                 │     │     Store            │
 │ Fetch RMP pages │ ──> │ Split text into │ ──> │ all-MiniLM-L6-v2     │
 │ requests +      │     │ 300-token chunks│     │ (sentence-           │
 │ BeautifulSoup   │     │ 50-token overlap│     │  transformers)       │
 │                 │     │                 │     │ → stored in ChromaDB │
 └─────────────────┘     └─────────────────┘     └──────────────────────┘
-                                                            │
-                                                            v
+                                                           │
+                                                           ▼
                         ┌─────────────────┐     ┌──────────────────────┐
-                        │ 5. Generation   │     │ 4. Retrieval         │
+                        │  5. Generation  │     │  4. Retrieval        │
                         │                 │     │                      │
                         │ Groq            │ <── │ Embed user query,    │
-                        │ llama-3.3-70b-  │     │ find top-k=5 most     │
+                        │ llama-3.3-70b-  │     │ find top-k=5 most    │
                         │ versatile       │     │ similar chunks from  │
                         │ answers using   │     │ ChromaDB             │
                         │ retrieved chunks│     │                      │
                         └─────────────────┘     └──────────────────────┘
----
+```
 
 ## AI Tool Plan
 
@@ -174,5 +174,5 @@ Groq llama-3.3-70b-versatile model to generate an answer, plus a simple
 command-line interface for asking questions. I'll verify by running my 5
 evaluation questions and comparing each answer against my expected answers,
 checking that the system cites information actually present in the reviews.
-That's specific in the way the prompt asks for — it names the tool, the exact inputs (which planning sections), the expected output, and a concrete
+That's specific in the way the prompt asks for, it names the tool, the exact inputs (which planning sections), the expected output, and a concrete
 
