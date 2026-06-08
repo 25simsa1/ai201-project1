@@ -27,7 +27,7 @@ A real `GROQ_API_KEY` must be in `.env` for generation to work.
 
 Student reviews of Colby College professors, sourced from Rate My Professors.
 This knowledge is valuable because the official course catalog only describes
-*what* a class covers — it says nothing about teaching style, grading
+*what* a class coverrs, it says nothing about teaching style, grading
 strictness, workload, or whether a professor actually helps you learn. Students
 get that information from peers, but there's no way to query across many
 professors at once. This system lets a student ask one question (e.g. "who
@@ -70,7 +70,7 @@ of subjects and teaching styles. 207 reviews total.
 **Overlap:** 50 tokens
 
 **Why these choices fit your documents:** RMP reviews are short (1–5 sentences
-each), so a single review is far too small to be a chunk on its own — it loses
+each), so a single review is far too small to be a chunk on its own, it loses
 context and the embeddings become noisy. Instead of cutting blindly every N
 tokens, my chunker (`ingest.py`) packs whole reviews together until adding the
 next one would exceed 256 tokens, which fits roughly 2–4 reviews per chunk.
@@ -171,7 +171,7 @@ Q2 is the clearest failure and is analyzed below.
 (picking Findlay's MACROTHEORY at difficulty 1) and even admitted "difficulty
 and workload are not always the same thing" before answering anyway. It only
 considered 4 of the 10 professors, and the top-ranked retrieved chunk was
-actually Findlay's EC338 at **difficulty 4** — not a light class at all.
+actually Findlay's EC338 at **difficulty 4**,  not a light class at all.
 
 **Root cause (tied to a specific pipeline stage):** This is a **retrieval**
 failure caused by the mismatch between a superlative/aggregation question and
