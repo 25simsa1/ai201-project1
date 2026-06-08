@@ -15,7 +15,7 @@ import random
 from transformers import AutoTokenizer
 
 DATA_DIR = "data"
-CHUNK_SIZE = 300       # tokens, from planning.md
+CHUNK_SIZE = 256       # tokens - set to MiniLM's max seq length (see planning.md)
 CHUNK_OVERLAP = 50     # tokens, from planning.md
 
 # I count tokens with MiniLM's own tokenizer since that's the model that will

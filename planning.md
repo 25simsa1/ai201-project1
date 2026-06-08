@@ -45,14 +45,23 @@ answers across many reviews instantly.
      numbers fit the structure of your documents.
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
-**Chunk size:** 300 tokens
+**Chunk size:** 256 tokens
 
 **Overlap:** 50 tokens
 
 **Reasoning:** Rate My Professors reviews are short (1-5 sentences each).
-A 300-token chunk fits 2-4 reviews together, giving enough context without
+A 256-token chunk fits 2-4 reviews together, giving enough context without
 mixing too many professors. A 50-token overlap ensures a review that falls
 on a chunk boundary isn't split in a way that loses meaning.
+
+**Update (during implementation):** I originally planned 300 tokens, but
+all-MiniLM-L6-v2 has a max sequence length of 256 tokens — anything longer
+gets silently truncated at embedding time, so the tail of a 300-token chunk
+would never make it into the vector. I lowered the chunk size to 256 to match
+the model so every token actually gets embedded. This produced 93 chunks
+(avg ~219 tokens). Because I pack whole reviews together instead of cutting
+mid-review, a few chunks land slightly above 256, which only clips a handful
+of tokens.
 
 ---
 
