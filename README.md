@@ -155,7 +155,7 @@ verbatim from real reviews.
 **Retrieval quality:** Relevant / Partially relevant / Off-target
 **Response accuracy:** Accurate / Partially accurate / Inaccurate
 
-Q1 and Q4 are clean wins — the retrieved chunks directly contain the answer and
+Q1 and Q4 are clean, the retrieved chunks directly contain the answer and
 every claim is traceable to a quote. Q3 and Q5 are partially accurate because
 the model adds reasonable but unsupported inferences (e.g. inferring Youngs
 gives good *feedback* from a review that only says she explains material well).
@@ -177,7 +177,7 @@ actually Findlay's EC338 at **difficulty 4**,  not a light class at all.
 failure caused by the mismatch between a superlative/aggregation question and
 top-k similarity search. "Lightest workload" requires *comparing all 10
 professors*, but retrieval only returns the 5 chunks whose embeddings are
-nearest to the phrase "lightest workload" — it never sees the other professors,
+nearest to the phrase "lightest workload", it never sees the other professors,
 so the model can't actually rank the whole field. Worse, the reviews rarely use
 the word "workload" explicitly, so the embedding model matches on the closest
 available signal (difficulty language and ratings) and the LLM is forced to use
@@ -187,7 +187,7 @@ lightest load. This is the "cross-professor" limitation I flagged in
 planning.md showing up in practice.
 
 **What you would change to fix it:** Two options. (1) For aggregation questions,
-retrieve *per professor* — run the query with a metadata filter for each
+retrieve *per professor*, run the query with a metadata filter for each
 professor and take the top chunk from each, so all 10 are represented before the
 LLM compares them. (2) Store the numeric difficulty/quality ratings as
 structured metadata and sort/aggregate on them directly instead of hoping the
