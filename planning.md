@@ -114,25 +114,14 @@ this project well.
      You'll use this diagram as context when prompting AI tools to implement each stage. -->
 
 
-┌─────────────────┐     ┌─────────────────┐     ┌──────────────────────┐
-│  1. Ingestion   │     │  2. Chunking    │     │  3. Embedding +      │
-│                 │     │                 │     │     Store            │
-│ Fetch RMP pages │ ──> │ Split text into │ ──> │ all-MiniLM-L6-v2     │
-│ requests +      │     │ 300-token chunks│     │ (sentence-           │
-│ BeautifulSoup   │     │ 50-token overlap│     │  transformers)       │
-│                 │     │                 │     │ → stored in ChromaDB │
-└─────────────────┘     └─────────────────┘     └──────────────────────┘
-                                                           │
-                                                           ▼
-                        ┌─────────────────┐     ┌──────────────────────┐
-                        │  5. Generation  │     │  4. Retrieval        │
-                        │                 │     │                      │
-                        │ Groq            │ <── │ Embed user query,    │
-                        │ llama-3.3-70b-  │     │ find top-k=5 most    │
-                        │ versatile       │     │ similar chunks from  │
-                        │ answers using   │     │ ChromaDB             │
-                        │ retrieved chunks│     │                      │
-                        └─────────────────┘     └──────────────────────┘
+```mermaid
+flowchart LR
+    A["**1. Ingestion**\nFetch RMP pages\nrequests + BeautifulSoup"] -->
+    B["**2. Chunking**\nSplit text into\n300-token chunks\n50-token overlap"] -->
+    C["**3. Embedding + Store**\nall-MiniLM-L6-v2\n(sentence-transformers)\n→ stored in ChromaDB"]
+
+    C --> D["**4. Retrieval**\nEmbed user query,\nfind top-k=5 most\nsimilar chunks from ChromaDB"]
+    D --> E["**5. Generation**\nGroq llama-3.3-70b-versatile\nanswers using\nretrieved chunks"]
 ```
 
 ## AI Tool Plan
