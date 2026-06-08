@@ -16,5 +16,8 @@ env/
 chroma_db/
 chroma/
 
+# generated chunks (rebuilt by ingest.py)
+chunks.json
+
 # macOS
 .DS_Store
