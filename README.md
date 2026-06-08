@@ -223,27 +223,33 @@ saved them as `.txt` files instead — same data, different ingestion path.
 
 **Instance 1 — ingestion and chunking**
 
-- *What I gave the AI:* My Documents table and Chunking Strategy section from
-  planning.md (300 tokens / 50 overlap, "2–4 reviews per chunk"), plus the
-  problem that scraping RMP returned empty pages.
-- *What it produced:* It diagnosed that RMP is JavaScript-rendered and pulled
-  the reviews via the GraphQL API instead, then wrote a chunker.
-- *What I changed or overrode:* I directed it to pack **whole reviews** together
-  up to the token limit rather than splitting mechanically every N tokens (so no
-  chunk ends mid-sentence), and to **prepend the professor's name** to every
-  chunk to prevent cross-professor misattribution. I also had it switch the
-  chunk size from 300 to **256** once we confirmed MiniLM truncates at 256.
+- *What I gave the AI:* I'd already decided my chunking approach in planning.md
+  (pack whole reviews up to ~300 tokens, 50-token overlap) and hit a wall where
+  scraping RMP returned empty HTML. I asked it for ways to extract text from a
+  JavaScript-rendered site.
+- *What it produced:* It pointed me at the underlying GraphQL API as an
+  alternative to HTML scraping, and gave a first-pass chunker that split on a
+  fixed token count.
+- *What I decided / overrode:* The fixed-count split was wrong for my data — it
+  cut reviews mid-sentence — so I rewrote the chunking to pack **whole reviews**
+  together and to **prepend each professor's name** to every chunk so retrieval
+  can't confuse one professor with another. I also caught that
+  all-MiniLM-L6-v2 truncates at 256 tokens, so I dropped my chunk size from 300
+  to 256 myself and updated planning.md with the reasoning. The structure and
+  the key choices were mine; I used the tool mainly to get unstuck on the
+  scraping problem and to save boilerplate.
 
 **Instance 2 — grounded generation**
 
 - *What I gave the AI:* My grounding requirement (answer from retrieved context
-  only, cite sources) and the request to wire retrieval to Groq's
-  `llama-3.3-70b-versatile`.
-- *What it produced:* A `query.py` with a system prompt and an `ask()` function,
-  and a Gradio `app.py`.
-- *What I changed or overrode:* I insisted that **source attribution be
-  programmatic** — built from the files of the chunks actually retrieved — rather
-  than trusting the model to cite them, since an LLM can hallucinate or omit
-  citations. I also pinned the exact decline sentence ("I don't have enough
-  information on that.") and set `temperature=0` so answers stay factual and
-  repeatable, and made the UI hide sources when the model declines.
+  only, cite sources) and the plan to use Groq's `llama-3.3-70b-versatile`.
+- *What it produced:* A starting point for `query.py` and the Gradio `app.py`
+  where the model was asked to cite its own sources in the answer text.
+- *What I decided / overrode:* Letting the model cite its own sources was a bad
+  idea — an LLM can hallucinate or drop citations — so I changed it to build the
+  source list **in code** from the chunks that were actually retrieved. I also
+  tightened the system prompt to enforce grounding (not just suggest it), pinned
+  the exact refusal sentence "I don't have enough information on that.", set
+  `temperature=0` for repeatable answers, and made the UI hide sources when the
+  model declines. The grounding design decisions were mine; the tool wrote the
+  surrounding plumbing.
